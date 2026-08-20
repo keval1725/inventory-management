@@ -49,3 +49,4 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push kevalkadivar/inventory-api:latest
+          docker push kevalkadivar/inventory-api:${{ github.sha }}
