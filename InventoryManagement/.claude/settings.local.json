@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\({dependencies:p.dependencies,devDependencies:p.devDependencies},null,1\\)\\)\")",
+      "Bash(node -e \"console.log\\(require\\('./libs/shared/types/project.json'\\).tags\\)\")",
+      "Bash(npm view *)",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{const v=JSON.parse\\(s\\);console.log\\(v.filter\\(x=>x.startsWith\\('22.0'\\)\\).join\\(', '\\)\\)}\\)\")",
+      "Bash(npx nx *)"
+    ]
+  }
+}

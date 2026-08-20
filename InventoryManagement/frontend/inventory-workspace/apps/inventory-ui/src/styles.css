@@ -1,0 +1,143 @@
+/* CDK overlay positioning primitives — required for drawers, dialogs and menus. */
+@import '@angular/cdk/overlay-prebuilt.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper text-base font-sans text-ink antialiased;
+  }
+
+  /* Numbers are the content in this app. Tabular figures everywhere they appear,
+     so quantity and id columns align down the page like a printed count sheet. */
+  .font-mono,
+  input[type='number'] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-semibold tracking-tight text-ink;
+  }
+
+  /* One focus treatment for the whole app — safety amber, always visible,
+     never removed. Offset keeps it legible against both paper and ink grounds. */
+  :focus-visible {
+    outline: 2px solid theme('colors.hazard.DEFAULT');
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    @apply bg-hazard/30;
+  }
+
+  /* Sensible default for any bare form control, so a control without the
+     `invInput` directive still looks deliberate rather than unstyled.
+
+     Wrapped in `:where()` deliberately: `input:not([type='checkbox'])` would
+     otherwise outrank a single utility class, and every `pl-8` or `text-right`
+     applied to an input in a template would silently lose. `:where()`
+     contributes zero specificity, so utilities always win. */
+  :where(input:not([type='checkbox']):not([type='radio'])),
+  :where(select),
+  :where(textarea) {
+    @apply w-full rounded border border-line bg-surface px-2.5 py-1.5 text-base text-ink
+      placeholder:text-steel-400 disabled:bg-surface-sunken disabled:text-steel-500;
+  }
+
+  :where(input:not([type='checkbox']):not([type='radio']), select, textarea):focus {
+    @apply border-ink-600;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded border-2 border-solid border-transparent bg-steel-300 bg-clip-content;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-steel-400;
+  }
+}
+
+@layer components {
+  /*
+   * The status spine — this app's signature device.
+   *
+   * A 3px bar on the leading edge of a row, card, toast or drawer header that
+   * encodes state at a glance: safety tape from the warehouse floor, reused as
+   * an information channel. Applied to a table row's first cell, or to the
+   * root of a card. Absence of colour is itself the "nothing to see here" state,
+   * so a healthy table reads as clean vertical whitespace.
+   *
+   * Drawn as a pseudo-element rather than an inset `box-shadow`, because a
+   * shadow would occupy the one `box-shadow` property these elements also need
+   * for elevation — a spined toast would silently lose `shadow-popover`.
+   */
+  .spine,
+  .spine-attention,
+  .spine-problem,
+  .spine-muted,
+  .spine-ok {
+    position: relative;
+  }
+
+  .spine-attention::before,
+  .spine-problem::before,
+  .spine-muted::before,
+  .spine-ok::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 3px;
+    /* Follows a rounded corner instead of squaring it off. */
+    border-start-start-radius: inherit;
+    border-end-start-radius: inherit;
+  }
+
+  .spine-attention::before {
+    background: theme('colors.hazard.DEFAULT');
+  }
+
+  .spine-problem::before {
+    background: theme('colors.danger.DEFAULT');
+  }
+
+  .spine-muted::before {
+    background: theme('colors.steel.300');
+  }
+
+  .spine-ok::before {
+    background: theme('colors.ok.DEFAULT');
+  }
+
+  /* Column headers and eyebrows. Small, tracked, uppercase — the register of a
+     form field on a printed sheet, and unmistakable against sentence-case data. */
+  .micro-label {
+    @apply text-2xs font-semibold uppercase text-steel-500;
+  }
+}
+
+/* An admin tool has no business animating while someone is trying to read it. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

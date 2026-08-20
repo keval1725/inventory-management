@@ -1,0 +1,99 @@
+{
+  "name": "inventory-ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "inv",
+  "sourceRoot": "apps/inventory-ui/src",
+  "tags": ["scope:app"],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/inventory-ui",
+        "index": "apps/inventory-ui/src/index.html",
+        "browser": "apps/inventory-ui/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/inventory-ui/tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/inventory-ui/public"
+          }
+        ],
+        "styles": ["apps/inventory-ui/src/styles.css"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        },
+        "docker": {
+          "fileReplacements": [
+            {
+              "replace": "apps/inventory-ui/src/environments/environment.ts",
+              "with": "apps/inventory-ui/src/environments/environment.docker.ts"
+            }
+          ],
+          "outputHashing": "all"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "defaultConfiguration": "development",
+      "continuous": true,
+      "configurations": {
+        "production": {
+          "buildTarget": "inventory-ui:build:production"
+        },
+        "development": {
+          "buildTarget": "inventory-ui:build:development"
+        }
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "inventory-ui:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/inventory-ui/jest.config.ts",
+        "tsConfig": "apps/inventory-ui/tsconfig.spec.json"
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "inventory-ui:build",
+        "staticFilePath": "dist/apps/inventory-ui/browser",
+        "spa": true
+      }
+    }
+  }
+}

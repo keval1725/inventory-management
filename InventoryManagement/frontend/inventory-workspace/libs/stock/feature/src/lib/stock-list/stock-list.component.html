@@ -1,0 +1,66 @@
+<div class="max-w-4xl mx-auto p-6">
+  <h1 class="text-2xl font-semibold text-gray-900 mb-6">Stock Levels</h1>
+
+  <form [formGroup]="form" (ngSubmit)="onCreate()" class="flex gap-3 mb-6 items-end">
+    <div>
+      <label for="productId" class="block text-sm font-medium text-gray-700">Product ID</label>
+      <input id="productId" formControlName="productId" class="mt-1 rounded border-gray-300 shadow-sm w-64" />
+    </div>
+    <div>
+      <label for="warehouseId" class="block text-sm font-medium text-gray-700">Warehouse ID</label>
+      <input id="warehouseId" formControlName="warehouseId" class="mt-1 rounded border-gray-300 shadow-sm w-64" />
+    </div>
+    <div>
+      <label for="initialQuantity" class="block text-sm font-medium text-gray-700">Initial Qty</label>
+      <input
+        id="initialQuantity"
+        formControlName="initialQuantity"
+        type="number"
+        class="mt-1 rounded border-gray-300 shadow-sm w-24"
+      />
+    </div>
+    <button
+      type="submit"
+      [disabled]="form.invalid"
+      class="rounded bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 disabled:opacity-50"
+    >
+      Add Stock Level
+    </button>
+  </form>
+
+  @if (error()) {
+    <p class="text-sm text-red-600 mb-4">{{ error() }}</p>
+  }
+
+  <table class="w-full text-left border-collapse">
+    <thead>
+      <tr class="border-b border-gray-200">
+        <th class="py-2">Product ID</th>
+        <th class="py-2">Warehouse ID</th>
+        <th class="py-2">Quantity</th>
+        <th class="py-2"></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (stockLevel of stockLevels(); track stockLevel.id) {
+        <tr class="border-b border-gray-100">
+          <td class="py-2 font-mono text-xs">{{ stockLevel.productId }}</td>
+          <td class="py-2 font-mono text-xs">{{ stockLevel.warehouseId }}</td>
+          <td class="py-2">{{ stockLevel.quantity }}</td>
+          <td class="py-2 flex gap-2">
+            <button (click)="onAdjust(stockLevel.id, 10)" class="text-sm text-green-700 hover:underline">
+              +10
+            </button>
+            <button (click)="onAdjust(stockLevel.id, -10)" class="text-sm text-red-600 hover:underline">
+              -10
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (loading()) {
+    <p class="text-sm text-gray-500 mt-4">Loading...</p>
+  }
+</div>

@@ -1,0 +1,22 @@
+## .NET
+bin/
+obj/
+*.user
+.vs/
+
+## User secrets / local config
+appsettings.Local.json
+
+## Rider / VS Code
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+## Frontend (Nx/Angular)
+frontend/inventory-workspace/node_modules/
+frontend/inventory-workspace/dist/
+frontend/inventory-workspace/.nx/
+frontend/inventory-workspace/coverage/
+
+## Docker secrets
+.env

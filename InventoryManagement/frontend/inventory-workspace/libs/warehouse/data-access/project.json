@@ -1,0 +1,16 @@
+{
+  "name": "warehouse-data-access",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/warehouse/data-access/src",
+  "projectType": "library",
+  "tags": ["scope:warehouse", "type:data-access"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/warehouse/data-access/jest.config.cts"
+      }
+    }
+  }
+}

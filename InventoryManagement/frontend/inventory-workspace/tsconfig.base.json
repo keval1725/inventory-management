@@ -1,0 +1,45 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@inventory/shared-types": ["./libs/shared/types/src/index.ts"],
+      "@inventory/shared-data-access": [
+        "./libs/shared/data-access/src/index.ts"
+      ],
+      "@inventory/identity-data-access": [
+        "./libs/identity/data-access/src/index.ts"
+      ],
+      "@inventory/warehouse-data-access": [
+        "./libs/warehouse/data-access/src/index.ts"
+      ],
+      "@inventory/product-data-access": [
+        "./libs/product/data-access/src/index.ts"
+      ],
+      "@inventory/stock-data-access": ["./libs/stock/data-access/src/index.ts"],
+      "@inventory/identity-feature": ["./libs/identity/feature/src/index.ts"],
+      "@inventory/warehouse-feature": ["./libs/warehouse/feature/src/index.ts"],
+      "@inventory/product-feature": ["./libs/product/feature/src/index.ts"],
+      "@inventory/stock-feature": ["./libs/stock/feature/src/index.ts"],
+      "@inventory/shared-ui": ["./libs/shared/ui/src/index.ts"]
+    },
+    "strict": false,
+    "noUncheckedSideEffectImports": false,
+    "types": ["*"],
+    "esModuleInterop": false,
+    "ignoreDeprecations": "6.0"
+  },
+  "exclude": ["node_modules", "tmp"]
+}

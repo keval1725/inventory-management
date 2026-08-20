@@ -1,0 +1,63 @@
+<div class="max-w-4xl mx-auto p-6">
+  <h1 class="text-2xl font-semibold text-gray-900 mb-6">Warehouses</h1>
+
+  <form [formGroup]="form" (ngSubmit)="onCreate()" class="flex gap-3 mb-6 items-end">
+    <div>
+      <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+      <input id="name" formControlName="name" class="mt-1 rounded border-gray-300 shadow-sm" />
+    </div>
+    <div>
+      <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
+      <input id="address" formControlName="address" class="mt-1 rounded border-gray-300 shadow-sm" />
+    </div>
+    <button
+      type="submit"
+      [disabled]="form.invalid"
+      class="rounded bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 disabled:opacity-50"
+    >
+      Add Warehouse
+    </button>
+  </form>
+
+  @if (error()) {
+    <p class="text-sm text-red-600 mb-4">{{ error() }}</p>
+  }
+
+  <table class="w-full text-left border-collapse">
+    <thead>
+      <tr class="border-b border-gray-200">
+        <th class="py-2">Name</th>
+        <th class="py-2">Address</th>
+        <th class="py-2">Status</th>
+        <th class="py-2"></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (warehouse of warehouses(); track warehouse.id) {
+        <tr class="border-b border-gray-100">
+          <td class="py-2">{{ warehouse.name }}</td>
+          <td class="py-2">{{ warehouse.address }}</td>
+          <td class="py-2">
+            <span [class]="warehouse.isActive ? 'text-green-700' : 'text-gray-400'">
+              {{ warehouse.isActive ? 'Active' : 'Deactivated' }}
+            </span>
+          </td>
+          <td class="py-2">
+            @if (warehouse.isActive) {
+              <button
+                (click)="onDeactivate(warehouse.id)"
+                class="text-sm text-red-600 hover:underline"
+              >
+                Deactivate
+              </button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (loading()) {
+    <p class="text-sm text-gray-500 mt-4">Loading...</p>
+  }
+</div>
