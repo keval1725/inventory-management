@@ -33,9 +33,19 @@ jobs:
       - name: Test
         run: dotnet test Inventory.sln --configuration Release --no-build
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build Docker Image
         run: |
           docker build \
             -f src/backend/Inventory.API/Dockerfile \
-            -t inventory-api:latest \
+            -t kevalkadivar/inventory-api:latest \
+            -t kevalkadivar/inventory-api:${{ github.sha }} \
             .
+      - name: Push Docker Image
+        run: |
+          docker push kevalkadivar/inventory-api:latest
