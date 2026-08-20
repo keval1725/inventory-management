@@ -1,0 +1,145 @@
+# @format
+
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore Inventory.sln
+
+      - name: Build solution
+        run: dotnet build Inventory.sln --configuration Release --no-restore --warnaserror
+
+      - name: Run unit tests
+        run: dotnet test tests/Inventory.UnitTests/Inventory.UnitTests.csproj --configuration Release --no-restore --logger trx --collect "XPlat Code Coverage"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: tests/Inventory.UnitTests/TestResults
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend build, lint, and test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/inventory-workspace
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+          cache-dependency-path: frontend/inventory-workspace/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint workspace
+        run: npx nx run-many --target=lint --all --parallel=3
+
+      - name: Run unit tests
+        run: npx nx run-many --target=test --all --configuration=ci --parallel=3
+
+      - name: Build frontend
+        run: npx nx build inventory-ui --configuration=production
+
+  container:
+    name: Build container images
+    needs:
+      - backend
+      - frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build API image
+        run: docker build --tag inventory-api:ci --file src/backend/Inventory.API/Dockerfile .
+
+      - name: Build frontend image
+        run: docker build --tag inventory-ui:ci --file frontend/inventory-workspace/apps/inventory-ui/Dockerfile frontend/inventory-workspace
+
+  publish:
+    name: Publish images to GHCR
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs:
+      - container
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set image metadata
+        id: metadata
+        run: |
+          echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+          echo "sha=${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: src/backend/Inventory.API/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.metadata.outputs.owner }}/inventory-api:latest
+            ghcr.io/${{ steps.metadata.outputs.owner }}/inventory-api:${{ steps.metadata.outputs.sha }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend/inventory-workspace
+          file: frontend/inventory-workspace/apps/inventory-ui/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.metadata.outputs.owner }}/inventory-ui:latest
+            ghcr.io/${{ steps.metadata.outputs.owner }}/inventory-ui:${{ steps.metadata.outputs.sha }}
