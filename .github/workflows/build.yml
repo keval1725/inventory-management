@@ -32,10 +32,10 @@ jobs:
 
       - name: Test
         run: dotnet test Inventory.sln --configuration Release --no-build
-  
-  -    name: Build Docker Image
+
+      - name: Build Docker Image
         run: |
-    docker build \
-      -f src/backend/Inventory.API/Dockerfile \
-      -t inventory-api:latest \
-      .
+          docker build \
+            -f src/backend/Inventory.API/Dockerfile \
+            -t inventory-api:latest \
+            .
